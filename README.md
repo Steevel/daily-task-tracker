@@ -2,5 +2,4 @@
 
 ## Screenshots
 
-![Screenshots](./desktop.png)
-![Screenshots](./mobile.png)
+![Screenshots](./Daily%20Task%20Tracker.png)
