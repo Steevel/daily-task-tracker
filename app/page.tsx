@@ -1,7 +1,8 @@
 "use client";
-import TaskList from "@/components/TaskList";
-import Task from "@/types";
+// import TaskList from "@/components/TaskList";
+import Task, { CompletedTask } from "@/types";
 import { useEffect, useState } from "react";
+import Autocomplete from "@/components/Autocomplete";
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -11,6 +12,13 @@ export default function Home() {
   );
   const [currentTask, setCurrentTask] = useState<string>("");
   const [todaysTasks, setTodaysTasks] = useState<Task[]>([]);
+
+  // ======= Inteview =========
+  const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([]);
+  const [date, setDate] = useState("");
+  const [completedTasksDates, setCompletedTasksDates] = useState<string[]>();
+  console.log("completedTasksDates", completedTasksDates);
+  // ======= Inteview =========
 
   const data = [
     {
@@ -43,17 +51,15 @@ export default function Home() {
     },
   ];
 
-  // const addTask = (description: string) => {
-  //   const newTask: Task = {
-  //     id: Date.now(),
-  //     description,
-  //     completed: false,
-  //     days: selectedDays,
-  //   };
-  //   console.log("newTask ", newTask);
-  //   setTasks([...tasks, newTask]);
-  //   setSelectedDays([]);
-  // };
+  const countries = [
+    "India",
+    "Indonesia",
+    "Bangladesh",
+    "Brazil",
+    "Canada",
+    "China",
+    "Denmark",
+  ];
 
   const addTask = (description: string) => {
     if (selectedDays.length > 0) {
@@ -69,9 +75,6 @@ export default function Home() {
       alert("Please select at least one day for the task.");
     }
   };
-
-  console.log("tasks tasks: ", tasks);
-  console.log("todays tasks: ", todaysTasks);
 
   const toggleTaskCompletion = (taskId: number) => {
     const updatedTasks = todaysTasks.map((task) =>
@@ -113,8 +116,43 @@ export default function Home() {
     } else {
       setSelectedDays([...selectedDays, day]);
     }
-    console.log(day);
   };
+
+  // ================ Interview ===================
+  const handleCompletedTask = (id: any) => {
+    if (date !== "") {
+      const filterdTask = tasks.filter((task) => task.id === id);
+      const compTask: CompletedTask = { task: { ...filterdTask[0] }, date };
+      const newcompletedTasks: CompletedTask[] = [...completedTasks, compTask];
+      setCompletedTasks(newcompletedTasks);
+      setDate("");
+    } else {
+      alert("Select a date");
+    }
+  };
+
+  const calculatePercentage = (completedTaskCount: number) => {
+    const totalTasks = tasks.length;
+    const completionPercentage = (
+      (completedTaskCount / totalTasks) *
+      100
+    ).toFixed(2);
+
+    return completionPercentage;
+  };
+
+  useEffect(() => {
+    const allDates = completedTasks.map((task) => task.date);
+    const unique: string[] = [];
+    allDates.forEach((item) => {
+      if (!unique.includes(item)) {
+        unique.push(item);
+      }
+    });
+    setCompletedTasksDates(unique);
+  }, [completedTasks]);
+
+  // ================ Interview ===================
 
   useEffect(() => {
     const filteredTasks = tasks.filter((task) =>
@@ -139,6 +177,7 @@ export default function Home() {
               value={currentTask}
               onChange={(e) => setCurrentTask(e.target.value)}
             />
+
             <button
               className="bg-blue-600 text-white p-2 rounded-md"
               onClick={() => handleButtonClick()}
@@ -154,6 +193,7 @@ export default function Home() {
                   id={item.name}
                   onClick={() => handleCheckbox(item.value)}
                 />
+
                 <label htmlFor={item.name}>{item.name}</label>
               </span>
             ))}
@@ -161,7 +201,7 @@ export default function Home() {
         </div>
       </div>
       <div>
-        <p className="m-2 ">
+        {/* <p className="m-2 ">
           Completion Percentage: {calculateCompletionPercentage()}%
         </p>
         <div className="">
@@ -173,8 +213,8 @@ export default function Home() {
             toggleTaskCompletion={toggleTaskCompletion}
             editTaskDescription={editTaskDescription}
           />
-        </div>
-        <div className="">
+        </div> */}
+        <div className="border-2 border-blue-600 p-2">
           <h2 className="text-lg font-medium mb-2">All Tasks</h2>
           {
             <ul className="space-y-2">
@@ -183,6 +223,20 @@ export default function Home() {
                   key={task.id}
                   className="flex items-center border-2 border-slate-400 rounded-md p-2"
                 >
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => handleCompletedTask(task.id)}
+                    className="mr-2 w-5 h-5 "
+                  />
+                  <div className="border-2 border-red-600">
+                    <input
+                      type="date"
+                      name=""
+                      id=""
+                      onChange={(e) => setDate(e.target.value)}
+                    />
+                  </div>
                   <span
                     className={`flex-1 ${
                       task.completed ? "line-through text-gray-400 " : ""
@@ -195,6 +249,44 @@ export default function Home() {
             </ul>
           }
         </div>
+
+        {/* Completed tasks */}
+        <div className="p-5">
+          <h2 className="text-3xl font-bold">Completed Tasks</h2>
+
+          {completedTasksDates?.map((currDate) => {
+            const tasksForDate = completedTasks.filter(
+              (item) => item.date === currDate
+            );
+            const completedTaskCount = tasksForDate.length;
+
+            const completionPercentage =
+              calculatePercentage(completedTaskCount);
+
+            return (
+              <div key={currDate}>
+                <h3>{currDate}</h3>
+                <p>Percentage: {completionPercentage}%</p>
+                <ul className="space-y-2">
+                  {tasksForDate.map((filteredTask) => (
+                    <li
+                      key={filteredTask.task.id}
+                      className="flex items-center border-2 border-slate-400 rounded-md p-2"
+                    >
+                      <span className={`flex-1 text-slate-800`}>
+                        {filteredTask.task.description}
+                      </span>
+                      <span>{filteredTask.date}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Autocomplete */}
+        <Autocomplete values={countries} />
       </div>
     </div>
   );

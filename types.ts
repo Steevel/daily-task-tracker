@@ -5,4 +5,9 @@ interface Task {
   days: string[];
 }
 
+export interface CompletedTask {
+  task: Task;
+  date: string;
+}
+
 export default Task;

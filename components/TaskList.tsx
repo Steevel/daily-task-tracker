@@ -25,6 +25,9 @@ const TaskList: React.FC<TaskListProps> = ({
             onChange={() => toggleTaskCompletion(task.id)}
             className="mr-2 w-5 h-5 "
           />
+          <div className="border-2 border-red-600">
+            <input type="date" name="" id="" onChange={() => {}} />
+          </div>
           <span
             className={`flex-1 ${
               task.completed ? "line-through text-gray-400 " : ""
