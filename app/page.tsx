@@ -264,7 +264,7 @@ export default function Home() {
               calculatePercentage(completedTaskCount);
 
             return (
-              <div key={currDate}>
+              <div key={currDate} className="py-2">
                 <h3>{currDate}</h3>
                 <p>Percentage: {completionPercentage}%</p>
                 <ul className="space-y-2">
